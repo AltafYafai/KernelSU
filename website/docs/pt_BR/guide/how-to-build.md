@@ -1,15 +1,15 @@
-# Como construir o KernelSU?
+# Como compilar
 
-Primeiro, você deve ler a documentação oficial do Android para construção do kernel:
+Primeiro, você deve ler a documentação oficial do Android para compilação do kernel:
 
 1. [Como criar kernels](https://source.android.com/docs/setup/build/building-kernels)
 2. [Builds de versão de imagem genérica do kernel (GKI)](https://source.android.com/docs/core/architecture/kernel/gki-release-builds)
 
 ::: warning AVISO
-Esta página é para dispositivos GKI, se você usa um kernel antigo, consulte [Como integrar o KernelSU para kernels não GKI](how-to-integrate-for-non-gki).
+Esta página é para dispositivos GKI, se você usa um kernel antigo, consulte [Integração para dispositivos não-GKI](how-to-integrate-for-non-gki).
 :::
 
-## Construir o kernel
+## Compilar o kernel
 
 ### Sincronize o código-fonte do kernel
 
@@ -20,13 +20,13 @@ repo init -m manifest.xml
 repo sync
 ```
 
-O `<kernel_manifest.xml>` é um arquivo de manifesto que pode determinar uma construção exclusivamente, você pode usar o manifesto para fazer uma construção re-preduzível. Você deve baixar o arquivo de manifesto em [compilações de lançamento do Google GKI](https://source.android.com/docs/core/architecture/kernel/gki-release-builds).
+O arquivo `<kernel_manifest.xml>` é um manifesto que pode determinar exclusivamente uma compilação, permitindo que você a torne reprodutível. Para isso, você deve baixar o arquivo de manifesto em [Builds de versão de imagem genérica do kernel (GKI)](https://source.android.com/docs/core/architecture/kernel/gki-release-builds).
 
 ### Construir
 
 Por favor, verifique [Como criar kernels](https://source.android.com/docs/setup/build/building-kernels) primeiro.
 
-Por exemplo, precisamos construir a imagem do kernel `aarch64`:
+Por exemplo, para compilar uma imagem de kernel `aarch64`:
 
 ```sh
 LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh
@@ -34,15 +34,23 @@ LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh
 
 Não se esqueça de adicionar o sinalizador `LTO=thin`, caso contrário a compilação poderá falhar se a memória do seu computador for inferior a 24 GB.
 
-A partir do Android 13, o kernel é construído pelo `bazel`:
+A partir do Android 13, o kernel é compilado pelo `bazel`:
 
 ```sh
 tools/bazel build --config=fast //common:kernel_aarch64_dist
 ```
 
-## Construir o kernel com KernelSU
+::: info INFORMAÇÕES
+Para alguns kernel do Android 14, para fazer o Wi-Fi/Bluetooth funcionar, pode ser necessário remover todas as exportações protegidas pelo GKI:
 
-Se você conseguir construir o kernel com sucesso, então construir o KernelSU é muito fácil. Selecione qualquer um executado no diretório raiz de origem do kernel:
+```sh
+rm common/android/abi_gki_protected_exports_*
+```
+:::
+
+## Compilar o kernel com KernelSU
+
+Se você conseguir compilar o kernel com sucesso, adicionar suporte ao KernelSU será relativamente simples. Na raiz do diretório de origem do kernel, execute qualquer uma das opções listadas abaixo:
 
 ::: code-group
 
@@ -50,7 +58,7 @@ Se você conseguir construir o kernel com sucesso, então construir o KernelSU �
 curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 ```
 
-```sh[Branch principal (dev)]
+```sh[Branch main (dev)]
 curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 ```
 
@@ -60,4 +68,4 @@ curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh
 
 :::
 
-E então reconstrua o kernel e você obterá uma imagem do kernel com KernelSU!
+Então, reconstrua o kernel e você obterá uma imagem do kernel com o KernelSU!
